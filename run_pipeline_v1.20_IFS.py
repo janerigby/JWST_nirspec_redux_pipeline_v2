@@ -1,3 +1,4 @@
+# from Brian Welch, reducing jwst nirspec ifs spectra using v1.20 of the jwst pipeline
 # this is all copied over from my notebook nirspec_pipeline_rough
 # I put it in this script so I can easily run many iterations at once
 import numpy as np
