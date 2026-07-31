@@ -96,7 +96,7 @@ def run_pipeline(target, rundet1=True, runspec2=True, runspec3=True, runspec3_PR
 		input_path = '/Users/bwelch/Documents/data/sgas/sunburst/nirspec/MAST_2023-04-11T0820/JWST/'
 	if target == 'J1757132':
 		input_path = '/Users/bwelch/Documents/data/NIRSpec_PSF/full_uncal'
-		if target == 'SGAS1402m28':
+	if target == 'SGAS1402m28':
 		input_path = '/Users/jrrigby1/SCIENCE/JWST_Data/LEGGOS/SGAS1402m28/Raw_data/'
 
 	# 3) point to where you want your processed outputs to live
@@ -130,8 +130,8 @@ def run_pipeline(target, rundet1=True, runspec2=True, runspec3=True, runspec3_PR
 		output_path = '/Users/bwelch/Documents/data/sgas/sunburst/nirspec/pmap1466/'
 	if target == 'J1757132':
 		output_path = '/Users/bwelch/Documents/data/NIRSpec_PSF/pmap1466/'
-		if target == 'SGAS1402m28':
-				output_path = '/Users/jrrigby1/SCIENCE/JWST_Data/LEGGOS/SGAS1402m28/Redux_v1.20.2/'
+	if target == 'SGAS1402m28':
+		output_path = '/Users/jrrigby1/SCIENCE/JWST_Data/LEGGOS/SGAS1402m28/Redux_v1.20.2/'
 
 
 	if os.path.exists(output_path) == False: # if folder doesn't exist
@@ -151,7 +151,7 @@ def run_pipeline(target, rundet1=True, runspec2=True, runspec3=True, runspec3_PR
 		head = test[0].header
 		if head['BKGDTARG'] == False: ifu += 1
 		elif head['BKGDTARG'] == True: sky += 1
-	
+
 	print(f'Number of IFU: {ifu}, Number of sky: {sky}')
 
 
@@ -229,7 +229,7 @@ def run_pipeline(target, rundet1=True, runspec2=True, runspec3=True, runspec3_PR
 				asnfiles_sci += glob.glob(level2outputdir+'jw'+program_id+'-o'+obs_num_sci[1]+'*asn.json')
 			else:
 				asnfiles_sci = glob.glob(level2outputdir+'jw'+'*asn.json')
-						
+					
 			for asn in asnfiles_sci:
 				#print(asn)
 				spec2 = Spec2Pipeline()
@@ -241,7 +241,7 @@ def run_pipeline(target, rundet1=True, runspec2=True, runspec3=True, runspec3_PR
 				#spec2.nsclean.skip = False
 				#spec2.nsclean.save_mask = True
 				spec2.run(asn)
-						
+					
 			if process_background == True:
 				asnfiles_bkg = glob.glob(level2outputdir+'jw'+program_id+'-o'+obs_num_bkg+'*asn.json')
 				for asn in asnfiles_bkg:
@@ -357,13 +357,13 @@ def run_pipeline(target, rundet1=True, runspec2=True, runspec3=True, runspec3_PR
 			asnfile = os.path.join(output_path, fold, 'L3asn.json')
 						lev3asnname = 'Level3_' + target + '_ALLOBS'
 						writel3asn(calfiles, bkgfiles, asnfile, lev3asnname) 
-					
+				
 	if version == 'bgonly':
 		fold = folders_L3[0]
 		asnfile = os.path.join(output_path, fold, 'L3asn.json')
 		lev3asnname = 'Level3_' + target + '_BGONLY'
 		writel3asn(bkgfiles_cal, None, asnfile, lev3asnname)
-	
+
 	if version == 'nobg':
 		if len(folders_L3) == 1:
 			fold = folders_L3[0]
@@ -375,7 +375,7 @@ def run_pipeline(target, rundet1=True, runspec2=True, runspec3=True, runspec3_PR
 						writel3asn(calfiles, None, asnfile, lev3asnname)
 						# I guess this is deprecated since I put it all in the loop below to be able to do multiple resolutions
 						# oh well
-								
+							
 	# make multiple cubes at different resolutions:
 	if runspec3 == True:
 		reslist = [0.1, 0.05]
@@ -565,7 +565,7 @@ def writel3asn(scifiles, bgfiles, asnfile, prodname):
 		nbg=len(bgfiles)
 		for ii in range(0,nbg):
 			asn['products'][0]['members'].append({'expname': bgfiles[ii], 'exptype': 'background'})
-					
+				
 	# Write the association to a json file
 	_, serialized = asn.dump()
 	with open(asnfile, 'w') as outfile:
@@ -670,7 +670,7 @@ def run_clean_step(file, clean_dir, expand_flat=False):
 
 	filename = os.path.basename(file)
 	#filename = filename.replace('cal2','cal3') # don't update the names for this run, to save some disk space
-			
+		
 	new_file = clean_dir + filename  # write to a different directory to keep things straight
 	test_file = filename.replace('.fits','test.fits') # this is just for testing and looking at where the new bad pixels have 
 	# been flagged
@@ -753,11 +753,11 @@ def run_clean_step(file, clean_dir, expand_flat=False):
 		print('% valid pixels',(num/num_science)* 100)
 		input_cal.dq[test3] = np.bitwise_or(input_cal.dq[test3], datamodels.dqflags.pixel['DO_NOT_USE'])
 		input_cal.data[test3] = np.nan
-	
+
 	# TELEGRAPH Pixel
 	data4 = input_cal.data
 	dq4 = input_cal.dq
-			
+		
 	# set test DQ
 	tp = np.bitwise_and(dq4, TELEGRAPH_PIXEL).astype(bool)
 	bad =  np.bitwise_and(dq4, DO_NOT_USE).astype(bool)
@@ -780,7 +780,7 @@ def run_clean_step(file, clean_dir, expand_flat=False):
 	# MSA_FAILED_OPEN Pixel
 	data5 = input_cal.data
 	dq5 = input_cal.dq
-			
+		
 	# set test DQ
 	msa = np.bitwise_and(dq5, MSA_FAILED_OPEN).astype(bool)
 	bad =  np.bitwise_and(dq5, DO_NOT_USE).astype(bool)
@@ -803,7 +803,7 @@ def run_clean_step(file, clean_dir, expand_flat=False):
 	# FLUX_ESTIMATED Pixel
 	data6 = input_cal.data
 	dq6 = input_cal.dq
-			
+		
 	# set test DQ
 	fe = np.bitwise_and(dq6, FLUX_ESTIMATED).astype(bool)
 	bad =  np.bitwise_and(dq6, DO_NOT_USE).astype(bool)
@@ -862,16 +862,16 @@ def run_clean_step(file, clean_dir, expand_flat=False):
 			iy = uflat[0][i]
 			input_cal.dq[iy+1, ix] = np.bitwise_or(input_cal.dq[iy+1,ix], datamodels.dqflags.pixel['DO_NOT_USE'])
 			input_cal.dq[iy+1, ix] = np.bitwise_or(input_cal.dq[iy+1,ix], datamodels.dqflags.pixel['UNRELIABLE_FLAT'])
-								
+							
 			input_cal.dq[iy-1, ix] = np.bitwise_or(input_cal.dq[iy-1,ix], datamodels.dqflags.pixel['DO_NOT_USE'])
 			input_cal.dq[iy-1, ix] = np.bitwise_or(input_cal.dq[iy-1,ix], datamodels.dqflags.pixel['UNRELIABLE_FLAT'])
-								
+							
 			input_cal.dq[iy-2, ix] = np.bitwise_or(input_cal.dq[iy-2,ix], datamodels.dqflags.pixel['DO_NOT_USE'])
 			input_cal.dq[iy-2, ix] = np.bitwise_or(input_cal.dq[iy-2,ix], datamodels.dqflags.pixel['UNRELIABLE_FLAT'])
-								
+							
 			input_cal.dq[iy+2, ix] = np.bitwise_or(input_cal.dq[iy+2,ix], datamodels.dqflags.pixel['DO_NOT_USE'])
 			input_cal.dq[iy+2, ix] = np.bitwise_or(input_cal.dq[iy+2,ix], datamodels.dqflags.pixel['UNRELIABLE_FLAT'])
-								
+							
 
 	input_cal.save(new_file)
 	input_test.dq = dq_test
