@@ -189,13 +189,13 @@ def run_pipeline(target, rundet1=True, runspec2=True, runspec3=True, runspec3_PR
 		det1.ramp_fit.maximum_cores = 'half'
 		# NSClean step moved to Detector1 pipeline
 		# throws an error if there's nothing on NRS2, so
-			if 'M' in head['GRATING']:
-				if 'nrs2' in exposure:
-					det1.clean_flicker_noise.skip = True
-			else:
-				det1.clean_flicker_noise.skip = False
-				det1.clean_flicker_noise.fit_method = 'fft'
-				det1.clean_flicker_noise.mask_science_regions = True
+		if 'M' in head['GRATING']:
+			if 'nrs2' in exposure:
+				det1.clean_flicker_noise.skip = True
+		else:
+			det1.clean_flicker_noise.skip = False
+			det1.clean_flicker_noise.fit_method = 'fft'
+			det1.clean_flicker_noise.mask_science_regions = True
 
 			det1.run(exposure)
 
@@ -229,7 +229,7 @@ def run_pipeline(target, rundet1=True, runspec2=True, runspec3=True, runspec3_PR
 				asnfiles_sci += glob.glob(level2outputdir+'jw'+program_id+'-o'+obs_num_sci[1]+'*asn.json')
 			else:
 				asnfiles_sci = glob.glob(level2outputdir+'jw'+'*asn.json')
-					
+			
 			for asn in asnfiles_sci:
 				#print(asn)
 				spec2 = Spec2Pipeline()
@@ -241,7 +241,7 @@ def run_pipeline(target, rundet1=True, runspec2=True, runspec3=True, runspec3_PR
 				#spec2.nsclean.skip = False
 				#spec2.nsclean.save_mask = True
 				spec2.run(asn)
-					
+			
 			if process_background == True:
 				asnfiles_bkg = glob.glob(level2outputdir+'jw'+program_id+'-o'+obs_num_bkg+'*asn.json')
 				for asn in asnfiles_bkg:
@@ -256,19 +256,19 @@ def run_pipeline(target, rundet1=True, runspec2=True, runspec3=True, runspec3_PR
 				head = fits.open(file)[0].header
 				if 'M' in head['GRATING']: 
 					if 'nrs2' in file: continue
-								#print(file)
-								spec2 = Spec2Pipeline()
-								spec2.output_dir = output_path + folders_L2b[1]
-								spec2.save_results = True
-								# skip cube building and 1d extraction, since we don't really use those anyway
-								spec2.cube_build.skip = True 
-								spec2.extract_1d.skip = True
-								spec2.pixel_replace.skip = False
-								spec2.pixel_replace.algorithm = 'mingrad'
-								# NSClean in Spec2 is deprecated, moved to Detector1 pipeline 
-								#spec2.nsclean.skip = False
-								#spec2.nsclean.save_mask = True
-								spec2.run(file)
+					#print(file)
+					spec2 = Spec2Pipeline()
+					spec2.output_dir = output_path + folders_L2b[1]
+					spec2.save_results = True
+					# skip cube building and 1d extraction, since we don't really use those anyway
+					spec2.cube_build.skip = True 
+					spec2.extract_1d.skip = True
+					spec2.pixel_replace.skip = False
+					spec2.pixel_replace.algorithm = 'mingrad'
+					# NSClean in Spec2 is deprecated, moved to Detector1 pipeline 
+					#spec2.nsclean.skip = False
+					#spec2.nsclean.save_mask = True
+					spec2.run(file)
 
 
 		print(f'Done Spec2 Pipeline for {target}')
@@ -355,9 +355,9 @@ def run_pipeline(target, rundet1=True, runspec2=True, runspec3=True, runspec3_PR
 		else:
 			fold = folders_L3[1]
 			asnfile = os.path.join(output_path, fold, 'L3asn.json')
-						lev3asnname = 'Level3_' + target + '_ALLOBS'
-						writel3asn(calfiles, bkgfiles, asnfile, lev3asnname) 
-				
+			lev3asnname = 'Level3_' + target + '_ALLOBS'
+			writel3asn(calfiles, bkgfiles, asnfile, lev3asnname) 
+		
 	if version == 'bgonly':
 		fold = folders_L3[0]
 		asnfile = os.path.join(output_path, fold, 'L3asn.json')
@@ -371,11 +371,11 @@ def run_pipeline(target, rundet1=True, runspec2=True, runspec3=True, runspec3_PR
 		else:
 			fold = folders_L3[3]
 			asnfile = os.path.join(output_path, fold, 'L3asn.json')
-						lev3asnname = 'Level3_' + target + '_NOBG_IFUALIGN_XY0p1'
-						writel3asn(calfiles, None, asnfile, lev3asnname)
-						# I guess this is deprecated since I put it all in the loop below to be able to do multiple resolutions
-						# oh well
-							
+			lev3asnname = 'Level3_' + target + '_NOBG_IFUALIGN_XY0p1'
+			writel3asn(calfiles, None, asnfile, lev3asnname)
+			# I guess this is deprecated since I put it all in the loop below to be able to do multiple resolutions
+			# oh well
+					
 	# make multiple cubes at different resolutions:
 	if runspec3 == True:
 		reslist = [0.1, 0.05]
@@ -407,16 +407,16 @@ def run_pipeline(target, rundet1=True, runspec2=True, runspec3=True, runspec3_PR
 				writel3asn(calfiles, None, asnfile, lev3asnname)
 				offsetfile = os.path.join(output_path, fold, 'offsets.asdf')
 				make_offset_file(target, calfiles, offsetfile)
-							spec3 = Spec3Pipeline()
-							spec3.output_dir = output_path + fold # use folder defined in cell above - output to same dir as asn file
-							# Outlier detection
-							spec3.outlier_detection.skip = False
-							spec3.outlier_detection.ifu_second_check = True
-							# cube building parameters
-							#spec3.cube_build.coord_system = 'ifualign'
-							spec3.cube_build.coord_system = 'skyalign'
-							spec3.cube_build.scalexy = res
-							###############################################
+				spec3 = Spec3Pipeline()
+				spec3.output_dir = output_path + fold # use folder defined in cell above - output to same dir as asn file
+				# Outlier detection
+				spec3.outlier_detection.skip = False
+				spec3.outlier_detection.ifu_second_check = True
+				# cube building parameters
+				#spec3.cube_build.coord_system = 'ifualign'
+				spec3.cube_build.coord_system = 'skyalign'
+				spec3.cube_build.scalexy = res
+				###############################################
 			if target == 'COSMICEYE':
 				spec3.cube_build.nspax_x = 59 
 				spec3.cube_build.nspax_y = 65 
@@ -470,14 +470,14 @@ def run_pipeline(target, rundet1=True, runspec2=True, runspec3=True, runspec3_PR
 					#	spec3.cube_build.dec_center = -78.1864364
 					#	spec3.cube_build.offset_file = offsetfileP23
 					spec3.run(asn)
-								# run bg subtraction:
-								do_bgsub_step(target, output_path, folders_L3, lev3asnnameP1)
-								do_bgsub_step(target, output_path, folders_L3, lev3asnnameP23)
+					# run bg subtraction:
+					do_bgsub_step(target, output_path, folders_L3, lev3asnnameP1)
+					do_bgsub_step(target, output_path, folders_L3, lev3asnnameP23)
 			else:
 				spec3.run(asnfile)
 				# run bg subtraction:
 				do_bgsub_step(target, output_path, folders_L3, lev3asnname)
-							print(f'Done res: {res}')
+				print(f'Done res: {res}')
 
 		if target == 'SGAS1110': # handle wopr:
 			calfiles2 = glob.glob(output_path + folders_L2b[1] + 'jw03843005*cal2.fits') # wopr only = obs 005
@@ -521,9 +521,9 @@ def run_pipeline(target, rundet1=True, runspec2=True, runspec3=True, runspec3_PR
 			with fits.open(file) as hdu:
 				if hdu[0].header['GRATING'] == 'PRISM':
 					calfiles_prism.append(file)
-														# print(calfiles_prism)
-														asnfile = os.path.join(output_path, fold, 'L3PRISMasn.json')
-														reslist = [0.1]#, 0.03]
+					# print(calfiles_prism)
+					asnfile = os.path.join(output_path, fold, 'L3PRISMasn.json')
+					reslist = [0.1]#, 0.03]
 		for res in reslist:
 			print(f'Starting non-linear prism, res {res}')
 			res_str = str(res).split('.')[-1]
@@ -565,7 +565,7 @@ def writel3asn(scifiles, bgfiles, asnfile, prodname):
 		nbg=len(bgfiles)
 		for ii in range(0,nbg):
 			asn['products'][0]['members'].append({'expname': bgfiles[ii], 'exptype': 'background'})
-				
+		
 	# Write the association to a json file
 	_, serialized = asn.dump()
 	with open(asnfile, 'w') as outfile:
@@ -609,10 +609,10 @@ def make_offset_file(target, calfiles, offsetfile):
 		g235m_ddec = 0.48
 		g140h_dra  = -1.25#6.37
 		g140h_ddec = 0.48
-					ra_offsets  = []
-					dec_offsets = []
-					filelist    = []
-					#print(calfiles)
+		ra_offsets  = []
+		dec_offsets = []
+		filelist    = []
+		#print(calfiles)
 	for file in calfiles:
 		head = fits.open(file)[0].header
 		grating = head['GRATING']
@@ -628,13 +628,13 @@ def make_offset_file(target, calfiles, offsetfile):
 		if grating == 'G235H':
 			ra_offsets.append(g235m_dra) # use g235m also for g235h - they're close enough by eye
 			dec_offsets.append(g235m_ddec)
-						filelist.append(file.split('/')[-1])
-									tree = {
-										"units": str(u.arcsec),
-										"filename":filelist,
-										"raoffset": ra_offsets,
-										"decoffset": dec_offsets
-									}
+			filelist.append(file.split('/')[-1])
+			tree = {
+				"units": str(u.arcsec),
+				"filename":filelist,
+				"raoffset": ra_offsets,
+				"decoffset": dec_offsets
+			}
 	with asdf.AsdfFile(tree) as af:
 		af.write_to(offsetfile)
 
@@ -670,7 +670,7 @@ def run_clean_step(file, clean_dir, expand_flat=False):
 
 	filename = os.path.basename(file)
 	#filename = filename.replace('cal2','cal3') # don't update the names for this run, to save some disk space
-		
+
 	new_file = clean_dir + filename  # write to a different directory to keep things straight
 	test_file = filename.replace('.fits','test.fits') # this is just for testing and looking at where the new bad pixels have 
 	# been flagged
@@ -757,7 +757,7 @@ def run_clean_step(file, clean_dir, expand_flat=False):
 	# TELEGRAPH Pixel
 	data4 = input_cal.data
 	dq4 = input_cal.dq
-		
+
 	# set test DQ
 	tp = np.bitwise_and(dq4, TELEGRAPH_PIXEL).astype(bool)
 	bad =  np.bitwise_and(dq4, DO_NOT_USE).astype(bool)
@@ -780,7 +780,7 @@ def run_clean_step(file, clean_dir, expand_flat=False):
 	# MSA_FAILED_OPEN Pixel
 	data5 = input_cal.data
 	dq5 = input_cal.dq
-		
+
 	# set test DQ
 	msa = np.bitwise_and(dq5, MSA_FAILED_OPEN).astype(bool)
 	bad =  np.bitwise_and(dq5, DO_NOT_USE).astype(bool)
@@ -803,7 +803,7 @@ def run_clean_step(file, clean_dir, expand_flat=False):
 	# FLUX_ESTIMATED Pixel
 	data6 = input_cal.data
 	dq6 = input_cal.dq
-		
+
 	# set test DQ
 	fe = np.bitwise_and(dq6, FLUX_ESTIMATED).astype(bool)
 	bad =  np.bitwise_and(dq6, DO_NOT_USE).astype(bool)
@@ -862,16 +862,16 @@ def run_clean_step(file, clean_dir, expand_flat=False):
 			iy = uflat[0][i]
 			input_cal.dq[iy+1, ix] = np.bitwise_or(input_cal.dq[iy+1,ix], datamodels.dqflags.pixel['DO_NOT_USE'])
 			input_cal.dq[iy+1, ix] = np.bitwise_or(input_cal.dq[iy+1,ix], datamodels.dqflags.pixel['UNRELIABLE_FLAT'])
-							
+					
 			input_cal.dq[iy-1, ix] = np.bitwise_or(input_cal.dq[iy-1,ix], datamodels.dqflags.pixel['DO_NOT_USE'])
 			input_cal.dq[iy-1, ix] = np.bitwise_or(input_cal.dq[iy-1,ix], datamodels.dqflags.pixel['UNRELIABLE_FLAT'])
-							
+					
 			input_cal.dq[iy-2, ix] = np.bitwise_or(input_cal.dq[iy-2,ix], datamodels.dqflags.pixel['DO_NOT_USE'])
 			input_cal.dq[iy-2, ix] = np.bitwise_or(input_cal.dq[iy-2,ix], datamodels.dqflags.pixel['UNRELIABLE_FLAT'])
-							
+					
 			input_cal.dq[iy+2, ix] = np.bitwise_or(input_cal.dq[iy+2,ix], datamodels.dqflags.pixel['DO_NOT_USE'])
 			input_cal.dq[iy+2, ix] = np.bitwise_or(input_cal.dq[iy+2,ix], datamodels.dqflags.pixel['UNRELIABLE_FLAT'])
-							
+					
 
 	input_cal.save(new_file)
 	input_test.dq = dq_test
@@ -897,13 +897,13 @@ def exp_bg_sub(cubefile, bgfile, outfile=None):
 				 head1['CDELT3'])
 	if len(cubewl) > len(data):
 		cubewl = cubewl[:-1]
-					# next, evaluate background on data wavelength points:
-					bgcalculated = bginterp(cubewl)
-					bgcube = np.tile(bgcalculated, (data.shape[2],data.shape[1],1)).T # cubeify!
-					# and subtract!
-					#print(len(data), len(cubewl))
-					bgsub_cube = data - bgcube
-					# save or return result:
+		# next, evaluate background on data wavelength points:
+		bgcalculated = bginterp(cubewl)
+		bgcube = np.tile(bgcalculated, (data.shape[2],data.shape[1],1)).T # cubeify!
+		# and subtract!
+		#print(len(data), len(cubewl))
+		bgsub_cube = data - bgcube
+		# save or return result:
 	if outfile:
 		hdu[1].data = bgsub_cube
 		hdu[1].header['comment'] = 'Expected Background Subtracted'
@@ -959,7 +959,7 @@ def do_bgsub_step(target, output_path, folders_L3, lev3asnname, special=False):
 		g235cube = os.path.join(output_path, folders_L3[0], lev3asnname+'_g235m-f170lp_s3d.fits')
 		g235out = g235cube.replace('NOBG', 'BGSUB')
 		exp_bg_sub(g235cube, expbg_file, g235out)
-					# and now for the TEMPLATES targets:
+# and now for the TEMPLATES targets:
 	if target == 'SGAS1723':
 		expbg_file = '/Users/bwelch/Documents/data/templates/sdss1723/nirspec/expected_bg/background.txt'
 		g395cube = os.path.join(output_path, folders_L3[0], lev3asnname+'_g395h-f290lp_s3d.fits')
@@ -983,7 +983,7 @@ def do_bgsub_step(target, output_path, folders_L3, lev3asnname, special=False):
 		g395cube = os.path.join(output_path, folders_L3[0], lev3asnname+'_g395m-f290lp_s3d.fits')
 		g395out = g395cube.replace('NOBG', 'BGSUB')
 		exp_bg_sub(g395cube, expbg_file, g395out)
-					# and other stuff: 
+# and other stuff: 
 	if target == 'SPARKLER':
 		expbg_file = '/Users/bwelch/Documents/data/sparkler/nirspec/expected_bg/background.txt'
 		g235cube = os.path.join(output_path, folders_L3[0], lev3asnname+'_g140m-f070lp_s3d.fits')
