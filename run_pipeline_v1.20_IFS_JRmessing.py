@@ -7,11 +7,10 @@ import os
 
 ###############################################
 # Set up CRDS path and server environment variables
-home = "/Users/bwelch/Documents/"
+home = "/Users/jrrigby1/Ref_files/"
 os.environ["CRDS_PATH"] = home + "crds_cache/jwst_ops"
 os.environ["CRDS_SERVER_URL"] = "https://jwst-crds.stsci.edu"
-#os.environ["CRDS_CONTEXT"] = "jwst_1536.pmap" # probably unnecessary, but included just to be sure
-os.environ["CRDS_CONTEXT"] = "jwst_1466.pmap"
+os.environ["CRDS_CONTEXT"] = "jwst_1464.pmap"
 
 
 import zipfile
