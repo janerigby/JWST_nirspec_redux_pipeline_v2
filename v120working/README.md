@@ -13,6 +13,6 @@ Next, make sure your python is pointing to a version built to work with v1.20 of
 ```python -c "from run_pipeline_v1p21_IFS import run_pipeline; run_pipeline('SGAS1110')"```
 
 This will call run_pipeline_v1p21_IFS.py, with is Codex's cleaned up version of Brian's v1.20 script to reduce the LEGGOS nirspec data.
-
+The reduction will take several hours.
 
 
