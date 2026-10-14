@@ -4,6 +4,8 @@
 Run as, for example:
     python download_leggos_from_mast.py 04125 AWS
     python download_leggos_from_mast.py 04125 MAST
+    python download_leggos_from_mast.py 04125 AWS --instrument miri
+    python download_leggos_from_mast.py 04125 AWS --instrument all
 """
 
 import argparse
@@ -20,6 +22,7 @@ from astropy.table import Table, unique, vstack
 DEFAULT_PID = 4125
 DOWNLOAD_SOURCE = "AWS"
 OBS_COLLECTION = "JWST"
+DEFAULT_INSTRUMENT = "NIRSPEC"
 PRODUCT_LIST_CHUNK_SIZE = 100
 DOWNLOAD_CHUNK_SIZE = 100
 
@@ -40,12 +43,48 @@ def parse_args(argv=None):
         help=f"download source (default configured in script: {DOWNLOAD_SOURCE})",
     )
     parser.add_argument(
+        "--instrument",
+        default=DEFAULT_INSTRUMENT,
+        help=(
+            "JWST instrument to select (default: nirspec). Instrument names are "
+            "case-insensitive; use 'all' to disable instrument filtering."
+        ),
+    )
+    parser.add_argument(
         "--output-root",
         type=Path,
         default=Path("Rawdata"),
         help="root for PID and target directories (default: Rawdata)",
     )
     return parser.parse_args(argv)
+
+
+def instrument_criterion(instrument):
+    """Return a MAST instrument_name filter, or None for all instruments."""
+    name = instrument.strip()
+    if not name:
+        raise ValueError("Instrument must be a name or 'all'")
+    if name.casefold() == "all":
+        return None
+
+    name = name.upper()
+    # MAST's JWST instrument_name values include observing modes after a slash
+    # (for example NIRSPEC/MSA). A bare instrument therefore needs a wildcard.
+    if "/" not in name and "*" not in name and "?" not in name:
+        name += "*"
+    return name
+
+
+def observation_query_criteria(pid, instrument):
+    """Build criteria for the MAST observation query."""
+    criteria = {
+        "obs_collection": OBS_COLLECTION,
+        "proposal_id": str(pid),
+    }
+    instrument_name = instrument_criterion(instrument)
+    if instrument_name is not None:
+        criteria["instrument_name"] = instrument_name
+    return criteria
 
 
 def choose_pid(pid):
@@ -252,11 +291,14 @@ def main(argv=None):
 
     source = configure_download_source(args.download_source)
     pid_dir = args.output_root / f"PID{pid:05d}"
-    print(f"Querying MAST for {OBS_COLLECTION} program {pid} ...", flush=True)
-    observations = Observations.query_criteria(
-        obs_collection=OBS_COLLECTION,
-        proposal_id=str(pid),
+    criteria = observation_query_criteria(pid, args.instrument)
+    instrument_label = criteria.get("instrument_name", "all instruments")
+    print(
+        f"Querying MAST for {OBS_COLLECTION} program {pid}, "
+        f"instrument {instrument_label} ...",
+        flush=True,
     )
+    observations = Observations.query_criteria(**criteria)
     print(f"Found {len(observations)} observations.", flush=True)
     if not len(observations):
         print(f"No observations matched PID {pid}; nothing to download.")
