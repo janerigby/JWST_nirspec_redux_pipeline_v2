@@ -1,6 +1,5 @@
 # JWST_nirspec_redux_pipeline_v2
-Converting our LEGGOS scripts from v1.20 of the JWST pipeline to v2
-
+Converting our LEGGOS scripts from v1.20 of the JWST pipeline to v2 and now v3
 
 TO do list:
 - 1) DONE Get v1.20 of pipeline working w the new C4 nispec spectra
